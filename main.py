@@ -1,89 +1,43 @@
 import streamlit as st
+import pandas as pd
 
-# 페이지 설정
-st.set_page_config(page_title="MBTI 여행지 추천기", page_icon="✈️")
+# 파일 업로드 및 불러오기
+st.title("2025년 5월 기준 연령별 인구 현황 분석")
+st.caption("상위 5개 행정구역의 연령별 인구 분포를 선 그래프로 보여줍니다.")
 
-st.title("🌍 MBTI로 떠나는 맞춤 여행 ✈️")
-st.write("당신의 성격에 꼭 맞는 여행지를 추천해드릴게요! 🧳")
+# CSV 파일 불러오기
+df = pd.read_csv("202505_202505_연령별인구현황_월간.csv", encoding="euc-kr")
 
-# MBTI별 특징 및 여행지 추천
-mbti_info = {
-    "INTJ": {
-        "desc": "전략가형 🧠 - 혼자만의 시간과 깊이 있는 탐구를 즐겨요.",
-        "places": ["📚 교토, 일본", "🏰 하이델베르크, 독일"]
-    },
-    "INTP": {
-        "desc": "논리적인 사색가 🧩 - 조용하고 신비한 분위기를 좋아해요.",
-        "places": ["🧊 헬싱키, 핀란드", "🌲 레벤워스, 미국"]
-    },
-    "ENTJ": {
-        "desc": "대담한 통솔자 👩‍💼 - 도전과 성공의 도시를 좋아해요.",
-        "places": ["🌆 뉴욕, 미국", "🏙️ 두바이, UAE"]
-    },
-    "ENTP": {
-        "desc": "뜨거운 논쟁을 즐기는 발명가 🔥 - 활기차고 트렌디한 도시를 좋아해요.",
-        "places": ["🎨 베를린, 독일", "🚲 암스테르담, 네덜란드"]
-    },
-    "INFJ": {
-        "desc": "통찰력 있는 조언자 🌌 - 고요하고 감성적인 도시를 사랑해요.",
-        "places": ["🌉 부다페스트, 헝가리", "🌅 스톡홀름, 스웨덴"]
-    },
-    "INFP": {
-        "desc": "열정적인 중재자 🎨 - 동화 같은 풍경을 가진 여행지를 좋아해요.",
-        "places": ["🎭 프라하, 체코", "🏖️ 산토리니, 그리스"]
-    },
-    "ENFJ": {
-        "desc": "정의로운 사회운동가 🌟 - 다양한 문화를 즐길 수 있는 도시를 선호해요.",
-        "places": ["💃 바르셀로나, 스페인", "🌲 밴쿠버, 캐나다"]
-    },
-    "ENFP": {
-        "desc": "재기발랄한 활동가 🎈 - 자유롭고 에너지 넘치는 여행을 원해요.",
-        "places": ["🎉 리우데자네이루, 브라질", "🌊 시드니, 호주"]
-    },
-    "ISTJ": {
-        "desc": "청렴결백한 논리주의자 📏 - 질서 있고 역사적인 도시를 좋아해요.",
-        "places": ["🎓 런던, 영국", "🏛️ 시카고, 미국"]
-    },
-    "ISFJ": {
-        "desc": "용감한 수호자 🛡️ - 전통과 따뜻함이 있는 여행지를 선호해요.",
-        "places": ["🏯 교토, 일본", "🏰 에든버러, 영국"]
-    },
-    "ESTJ": {
-        "desc": "엄격한 관리자 ⚖️ - 깔끔하고 효율적인 도시를 좋아해요.",
-        "places": ["🏙️ 워싱턴 D.C., 미국", "🏢 프랑크푸르트, 독일"]
-    },
-    "ESFJ": {
-        "desc": "사교적인 외교관 🎀 - 로맨틱하고 활기찬 도시를 좋아해요.",
-        "places": ["🍝 로마, 이탈리아", "🗼 파리, 프랑스"]
-    },
-    "ISTP": {
-        "desc": "만능 재주꾼 🛠️ - 액티비티와 탐험을 즐기는 스타일이에요.",
-        "places": ["🌋 레위니옹섬, 프랑스령", "🏄 호놀룰루, 하와이"]
-    },
-    "ISFP": {
-        "desc": "호기심 많은 예술가 🎨 - 자연과 예술이 어우러진 도시를 선호해요.",
-        "places": ["🛶 코펜하겐, 덴마크", "⛄ 삿포로, 일본"]
-    },
-    "ESTP": {
-        "desc": "모험을 즐기는 사업가 🏍️ - 흥미진진한 도시를 좋아해요.",
-        "places": ["🎲 라스베이거스, 미국", "🍜 방콕, 태국"]
-    },
-    "ESFP": {
-        "desc": "자유로운 영혼의 연예인 🎤 - 트렌디하고 활기찬 곳을 좋아해요.",
-        "places": ["🎭 바르셀로나, 스페인", "🌴 괌, 미국령"]
-    }
-}
+# 전처리
+age_columns = [col for col in df.columns if col.startswith("2025년05월_계_")]
+rename_dict = {}
+for col in age_columns:
+    if "총인구수" in col:
+        rename_dict[col] = "총인구수"
+    elif "100세 이상" in col:
+        rename_dict[col] = "100세 이상"
+    else:
+        rename_dict[col] = col.split("_")[-1].replace("세", "")
 
-# 사용자 입력
-mbti = st.selectbox("당신의 MBTI 유형은 무엇인가요?", list(mbti_info.keys()))
+df = df.rename(columns=rename_dict)
 
-# 추천 결과 출력
-if mbti:
-    st.subheader(f"💡 {mbti} 유형의 여행 성향")
-    st.write(mbti_info[mbti]["desc"])
+# '총인구수' 숫자형 변환 후 상위 5개 추출
+df["총인구수"] = df["총인구수"].str.replace(",", "").astype(int)
+top5 = df.sort_values(by="총인구수", ascending=False).head(5)
 
-    st.subheader("🌟 추천 여행지")
-    for place in mbti_info[mbti]["places"]:
-        st.write(place)
+# 연령 컬럼 추출 및 숫자형 변환
+age_cols = [col for col in top5.columns if col.isdigit() or col == "100세 이상"]
+for col in age_cols:
+    top5[col] = top5[col].astype(str).str.replace(",", "").astype(int)
 
-    st.balloons()
+# 시각화를 위한 전처리
+top5_age = top5[["행정구역"] + age_cols]
+top5_age = top5_age.set_index("행정구역").T
+
+# 선 그래프 시각화
+st.subheader("상위 5개 행정구역의 연령별 인구 분포")
+st.line_chart(top5_age)
+
+# 원본 데이터 표시
+st.subheader("원본 데이터 (상위 5개 행정구역)")
+st.dataframe(top5.reset_index(drop=True))
