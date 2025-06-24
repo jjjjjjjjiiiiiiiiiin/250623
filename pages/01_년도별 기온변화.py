@@ -10,8 +10,8 @@ st.title("🌡️ 연도별 기온 변화 추이 (1월 ~ 12월)")
 
 # CSV 파일 로드 (같은 폴더에 있는 파일)
 try:
-    df = pd.read_csv("월별 기온.csv")
-
+    df = pd.read_csv("월별 기온.csv", encoding="cp949")
+    
     # 연도 컬럼이 문자열일 수 있으므로 정수로 변환
     df['연도'] = df['연도'].astype(int)
 
