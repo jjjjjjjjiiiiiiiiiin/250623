@@ -4,23 +4,21 @@ import matplotlib.pyplot as plt
 
 # 페이지 설정
 st.set_page_config(page_title="연도별 기온 변화", layout="wide")
-
-# 제목
 st.title("🌡️ 연도별 기온 변화 추이 (1월 ~ 12월)")
 
-# CSV 파일 로드 (같은 폴더에 있는 파일)
 try:
+    # CSV 파일 읽기 (한글 인코딩 대응)
     df = pd.read_csv("월별 기온.csv", encoding="cp949")
-    
-    # 연도 컬럼이 문자열일 수 있으므로 정수로 변환
+
+    # 연도 컬럼이 문자열일 수 있으므로 정수형으로 변환
     df['연도'] = df['연도'].astype(int)
 
     # 연도 슬라이더 선택
     year_selected = st.slider("연도를 선택하세요", min_value=df['연도'].min(), max_value=2100, step=1)
 
     if year_selected in df['연도'].values:
-        # 해당 연도의 기온 데이터 추출
-        monthly_data = df[df['연도'] == year_selected].iloc[0, 1:]  # '1월'부터 '12월'까지
+        # 선택한 연도 월별 기온 추출
+        monthly_data = df[df['연도'] == year_selected].iloc[0, 1:]
         months = list(monthly_data.index)
         temps = monthly_data.values
 
